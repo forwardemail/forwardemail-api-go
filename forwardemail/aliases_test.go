@@ -457,7 +457,7 @@ func TestClient_DeleteAlias(t *testing.T) {
 				code: http.StatusInternalServerError,
 				body: "oh no",
 			},
-			want: fmt.Errorf("status: 500, body: oh no"),
+			want: fmt.Errorf("failed to complete request: oh no"),
 		},
 	}
 
