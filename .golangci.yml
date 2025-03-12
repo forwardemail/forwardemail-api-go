@@ -146,14 +146,6 @@ linters-settings:
     # Require printf-like format specifier (%s, %d for example) not present.
     no-printf-like: true
 
-    # Add custom rules for `charmbracelet/log`
-    rules:
-      - (github.com/charmbracelet/log.Logger).Info
-      - (github.com/charmbracelet/log.Logger).Error
-      - (github.com/charmbracelet/log.Logger).Warn
-      - (github.com/charmbracelet/log.Logger).Debug
-      - (github.com/charmbracelet/log.Logger).Fatal
-
   nestif:
     # Minimal complexity of if statements to report.
     min-complexity: 4
