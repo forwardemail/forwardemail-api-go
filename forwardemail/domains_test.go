@@ -1,6 +1,7 @@
 package forwardemail
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -391,7 +392,7 @@ func TestClient_DeleteDomain(t *testing.T) {
 				code: http.StatusInternalServerError,
 				body: "oh no",
 			},
-			want: fmt.Errorf("status: 500, body: oh no"),
+			want: fmt.Errorf("failed to complete request: oh no"), //nolint:all
 		},
 	}
 
@@ -417,11 +418,11 @@ func TestClient_DeleteDomain(t *testing.T) {
 
 // I took this black magic from here (thanks Joe):
 // https://github.com/google/go-cmp/issues/24#issuecomment-317635190
-func equateErrorMessage(x, y error) bool {
-	if x == nil || y == nil {
-		return x == nil && y == nil
+func equateErrorMessage(a, b error) bool {
+	if a == nil || b == nil {
+		return errors.Is(a, b)
 	}
-	return x.Error() == y.Error()
+	return a.Error() == b.Error()
 }
 
 func pointBool(b bool) *bool {

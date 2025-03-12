@@ -63,5 +63,5 @@ func (c *Client) doRequest(req *http.Request) ([]byte, error) {
 		return body, err
 	}
 
-	return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
+	return nil, fmt.Errorf("%w: %s", ErrRequestFailure, body)
 }
