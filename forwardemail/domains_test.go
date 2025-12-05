@@ -52,12 +52,12 @@ func TestClient_GetDomain(t *testing.T) {
 				HasVirusProtection:        true,
 				Plan:                      "enhanced_protection",
 				MaxRecipientsPerAlias:     10,
-				SmtpPort:                  "25",
+				SMTPPort:                  "25",
 				Name:                      "stark.com",
 				HasMxRecord:               true,
 				HasTxtRecord:              true,
 				VerificationRecord:        "v8O0S8JjRv",
-				Id:                        "15ff615b6180f1fc7faf40e6",
+				ID:                        "15ff615b6180f1fc7faf40e6",
 				Object:                    "domain",
 				CreatedAt:                 parseTime("2023-09-21T20:18:24.790Z"),
 				UpdatedAt:                 parseTime("2023-10-07T21:21:01.992Z"),
@@ -68,13 +68,13 @@ func TestClient_GetDomain(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.response)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.GetDomain(tt.domain)
@@ -150,12 +150,12 @@ func TestClient_GetDomains(t *testing.T) {
 					HasVirusProtection:        true,
 					Plan:                      "enhanced_protection",
 					MaxRecipientsPerAlias:     10,
-					SmtpPort:                  "25",
+					SMTPPort:                  "25",
 					Name:                      "stark.com",
 					HasMxRecord:               true,
 					HasTxtRecord:              true,
 					VerificationRecord:        "v8O0S8JjRv",
-					Id:                        "15ff615b6180f1fc7faf40e6",
+					ID:                        "15ff615b6180f1fc7faf40e6",
 					Object:                    "domain",
 					CreatedAt:                 parseTime("2023-09-21T20:18:24.790Z"),
 					UpdatedAt:                 parseTime("2023-10-07T21:21:01.992Z"),
@@ -168,12 +168,12 @@ func TestClient_GetDomains(t *testing.T) {
 					HasVirusProtection:        true,
 					Plan:                      "enhanced_protection",
 					MaxRecipientsPerAlias:     10,
-					SmtpPort:                  "25",
+					SMTPPort:                  "25",
 					Name:                      "rhodes.com",
 					HasMxRecord:               true,
 					HasTxtRecord:              true,
 					VerificationRecord:        "v0jJ88SROv",
-					Id:                        "e61ffff601c7fb14185af506",
+					ID:                        "e61ffff601c7fb14185af506",
 					Object:                    "domain",
 					CreatedAt:                 parseTime("2023-04-04T12:13:55.723Z"),
 					UpdatedAt:                 parseTime("2023-11-03T22:22:02.724Z"),
@@ -185,13 +185,13 @@ func TestClient_GetDomains(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.response)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.GetDomains()
@@ -252,12 +252,12 @@ func TestClient_CreateDomain(t *testing.T) {
 				HasVirusProtection:        true,
 				Plan:                      "enhanced_protection",
 				MaxRecipientsPerAlias:     10,
-				SmtpPort:                  "25",
+				SMTPPort:                  "25",
 				Name:                      "stark.com",
 				HasMxRecord:               true,
 				HasTxtRecord:              true,
 				VerificationRecord:        "v8O0S8JjRv",
-				Id:                        "15ff615b6180f1fc7faf40e6",
+				ID:                        "15ff615b6180f1fc7faf40e6",
 				Object:                    "domain",
 				CreatedAt:                 parseTime("2023-09-21T20:18:24.790Z"),
 				UpdatedAt:                 parseTime("2023-10-07T21:21:01.992Z"),
@@ -268,13 +268,13 @@ func TestClient_CreateDomain(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.response)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.CreateDomain(tt.domain, tt.parameters)
@@ -335,12 +335,12 @@ func TestClient_UpdateDomain(t *testing.T) {
 				HasVirusProtection:        true,
 				Plan:                      "enhanced_protection",
 				MaxRecipientsPerAlias:     10,
-				SmtpPort:                  "25",
+				SMTPPort:                  "25",
 				Name:                      "stark.com",
 				HasMxRecord:               true,
 				HasTxtRecord:              true,
 				VerificationRecord:        "v8O0S8JjRv",
-				Id:                        "15ff615b6180f1fc7faf40e6",
+				ID:                        "15ff615b6180f1fc7faf40e6",
 				Object:                    "domain",
 				CreatedAt:                 parseTime("2023-09-21T20:18:24.790Z"),
 				UpdatedAt:                 parseTime("2023-10-07T21:21:01.992Z"),
@@ -351,13 +351,13 @@ func TestClient_UpdateDomain(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.response)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.UpdateDomain(tt.domain, tt.parameters)
@@ -398,14 +398,14 @@ func TestClient_DeleteDomain(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(tt.resp.code)
 				fmt.Fprintf(w, tt.resp.body)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got := c.DeleteDomain(tt.domain)

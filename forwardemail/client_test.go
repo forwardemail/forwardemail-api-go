@@ -17,41 +17,41 @@ func TestNewClient(t *testing.T) {
 			name:    "empty options",
 			options: ClientOptions{},
 			want: &Client{
-				ApiUrl:     "https://api.forwardemail.net",
-				HttpClient: &http.Client{},
+				APIURL:     "https://api.forwardemail.net",
+				HTTPClient: &http.Client{},
 			},
 		},
 		{
 			name: "with api key",
 			options: ClientOptions{
-				ApiKey: "4e4d6c332b6fe62a63afe56171fd3725",
+				APIKey: "4e4d6c332b6fe62a63afe56171fd3725",
 			},
 			want: &Client{
-				ApiKey:     "4e4d6c332b6fe62a63afe56171fd3725",
-				ApiUrl:     "https://api.forwardemail.net",
-				HttpClient: &http.Client{},
+				APIKey:     "4e4d6c332b6fe62a63afe56171fd3725",
+				APIURL:     "https://api.forwardemail.net",
+				HTTPClient: &http.Client{},
 			},
 		},
 		{
 			name: "with api url",
 			options: ClientOptions{
-				ApiUrl: "https://google.com",
+				APIURL: "https://google.com",
 			},
 			want: &Client{
-				ApiUrl:     "https://google.com",
-				HttpClient: &http.Client{},
+				APIURL:     "https://google.com",
+				HTTPClient: &http.Client{},
 			},
 		},
 		{
 			name: "with everything at once",
 			options: ClientOptions{
-				ApiKey: "4e4d6c332b6fe62a63afe56171fd3725",
-				ApiUrl: "https://google.com",
+				APIKey: "4e4d6c332b6fe62a63afe56171fd3725",
+				APIURL: "https://google.com",
 			},
 			want: &Client{
-				ApiKey:     "4e4d6c332b6fe62a63afe56171fd3725",
-				ApiUrl:     "https://google.com",
-				HttpClient: &http.Client{},
+				APIKey:     "4e4d6c332b6fe62a63afe56171fd3725",
+				APIURL:     "https://google.com",
+				HTTPClient: &http.Client{},
 			},
 		},
 	}

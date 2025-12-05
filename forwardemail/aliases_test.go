@@ -60,11 +60,11 @@ func TestClient_GetAlias(t *testing.T) {
 				Account: Account{
 					Email:       "tony@stark.com",
 					DisplayName: "tony@stark.com",
-					Id:          "59ad551ae6fb4a4c53427ca38079f029",
+					ID:          "59ad551ae6fb4a4c53427ca38079f029",
 				},
 				Domain: Domain{
 					Name: "stark.com",
-					Id:   "15ff615b6180f1fc7faf40e6",
+					ID:   "15ff615b6180f1fc7faf40e6",
 				},
 				Name:                     "tony",
 				Labels:                   []string{"catch-all"},
@@ -72,7 +72,7 @@ func TestClient_GetAlias(t *testing.T) {
 				HasRecipientVerification: true,
 				Recipients:               []string{"james@rhodes.com"},
 				Description:              "main email",
-				Id:                       "6525b03e0bde8f333ace5824",
+				ID:                       "6525b03e0bde8f333ace5824",
 				Object:                   "alias",
 				CreatedAt:                parseTime("2023-10-10T20:12:46.588Z"),
 				UpdatedAt:                parseTime("2023-10-10T20:12:46.588Z"),
@@ -82,13 +82,13 @@ func TestClient_GetAlias(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.response)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.GetAlias(tt.req.domain, tt.req.alias)
@@ -174,11 +174,11 @@ func TestClient_GetAliases(t *testing.T) {
 					Account: Account{
 						Email:       "tony@stark.com",
 						DisplayName: "tony@stark.com",
-						Id:          "59ad551ae6fb4a4c53427ca38079f029",
+						ID:          "59ad551ae6fb4a4c53427ca38079f029",
 					},
 					Domain: Domain{
 						Name: "stark.com",
-						Id:   "15ff615b6180f1fc7faf40e6",
+						ID:   "15ff615b6180f1fc7faf40e6",
 					},
 					Name:                     "tony",
 					Labels:                   []string{"catch-all"},
@@ -186,7 +186,7 @@ func TestClient_GetAliases(t *testing.T) {
 					HasRecipientVerification: true,
 					Description:              "main email",
 					Recipients:               []string{"james@rhodes.com"},
-					Id:                       "6525b03e0bde8f333ace5824",
+					ID:                       "6525b03e0bde8f333ace5824",
 					Object:                   "alias",
 					CreatedAt:                parseTime("2023-10-10T20:12:46.588Z"),
 					UpdatedAt:                parseTime("2023-10-10T20:12:46.588Z"),
@@ -195,18 +195,18 @@ func TestClient_GetAliases(t *testing.T) {
 					Account: Account{
 						Email:       "tony@stark.com",
 						DisplayName: "tony@stark.com",
-						Id:          "59ad551ae6fb4a4c53427ca38079f029",
+						ID:          "59ad551ae6fb4a4c53427ca38079f029",
 					},
 					Domain: Domain{
 						Name: "stark.com",
-						Id:   "15ff615b6180f1fc7faf40e6",
+						ID:   "15ff615b6180f1fc7faf40e6",
 					},
 					Name:                     "james",
 					Labels:                   []string{"catch-all"},
 					IsEnabled:                true,
 					HasRecipientVerification: true,
 					Recipients:               []string{"james@rhodes.com"},
-					Id:                       "b078f60f2636c4d6cf668d9b36a3e42e",
+					ID:                       "b078f60f2636c4d6cf668d9b36a3e42e",
 					Object:                   "alias",
 					CreatedAt:                parseTime("2023-10-12T18:11:22.123Z"),
 					UpdatedAt:                parseTime("2023-10-12T19:55:56.534Z"),
@@ -217,13 +217,13 @@ func TestClient_GetAliases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.res)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.GetAliases(tt.req.domain)
@@ -292,11 +292,11 @@ func TestClient_CreateAlias(t *testing.T) {
 				Account: Account{
 					Email:       "tony@stark.com",
 					DisplayName: "tony@stark.com",
-					Id:          "59ad551ae6fb4a4c53427ca38079f029",
+					ID:          "59ad551ae6fb4a4c53427ca38079f029",
 				},
 				Domain: Domain{
 					Name: "stark.com",
-					Id:   "15ff615b6180f1fc7faf40e6",
+					ID:   "15ff615b6180f1fc7faf40e6",
 				},
 				Name:                     "*",
 				Labels:                   []string{"catch-all"},
@@ -304,7 +304,7 @@ func TestClient_CreateAlias(t *testing.T) {
 				HasRecipientVerification: true,
 				Description:              "main email",
 				Recipients:               []string{"james@rhodes.com"},
-				Id:                       "6525b03e0bde8f333ace5824",
+				ID:                       "6525b03e0bde8f333ace5824",
 				Object:                   "alias",
 				CreatedAt:                parseTime("2023-10-10T20:12:46.588Z"),
 				UpdatedAt:                parseTime("2023-11-11T22:12:42.533Z"),
@@ -314,13 +314,13 @@ func TestClient_CreateAlias(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.res)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.CreateAlias(tt.req.domain, tt.req.alias, tt.req.params)
@@ -390,11 +390,11 @@ func TestClient_UpdateAlias(t *testing.T) {
 				Account: Account{
 					Email:       "tony@stark.com",
 					DisplayName: "tony@stark.com",
-					Id:          "59ad551ae6fb4a4c53427ca38079f029",
+					ID:          "59ad551ae6fb4a4c53427ca38079f029",
 				},
 				Domain: Domain{
 					Name: "stark.com",
-					Id:   "15ff615b6180f1fc7faf40e6",
+					ID:   "15ff615b6180f1fc7faf40e6",
 				},
 				Name:                     "james",
 				Labels:                   []string{"catch-all", "friends"},
@@ -402,7 +402,7 @@ func TestClient_UpdateAlias(t *testing.T) {
 				IsEnabled:                true,
 				HasRecipientVerification: true,
 				Recipients:               []string{"james@rhodes.com"},
-				Id:                       "6525b03e0bde8f333ace5824",
+				ID:                       "6525b03e0bde8f333ace5824",
 				Object:                   "alias",
 				CreatedAt:                parseTime("2023-10-10T20:12:46.588Z"),
 				UpdatedAt:                parseTime("2023-11-11T22:12:42.533Z"),
@@ -412,13 +412,13 @@ func TestClient_UpdateAlias(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.res)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.UpdateAlias(tt.req.domain, tt.req.alias, tt.req.params)
@@ -463,14 +463,14 @@ func TestClient_DeleteAlias(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(tt.res.code)
 				fmt.Fprintf(w, tt.res.body)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got := c.DeleteAlias(tt.req.domain, tt.req.alias)

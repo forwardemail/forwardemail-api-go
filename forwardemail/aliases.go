@@ -20,7 +20,7 @@ type Alias struct {
 	IsEnabled                bool      `json:"is_enabled"`
 	HasRecipientVerification bool      `json:"has_recipient_verification"`
 	Recipients               []string  `json:"recipients"`
-	Id                       string    `json:"id"`
+	ID                       string    `json:"id"`
 	Object                   string    `json:"object"`
 	CreatedAt                time.Time `json:"created_at"`
 	UpdatedAt                time.Time `json:"updated_at"`
@@ -58,7 +58,7 @@ func (c *Client) GetAliases(domain string) ([]Alias, error) {
 }
 
 // GetAlias retrieves a specific email alias by name for the specified domain.
-func (c *Client) GetAlias(domain string, alias string) (*Alias, error) {
+func (c *Client) GetAlias(domain, alias string) (*Alias, error) {
 	req, err := c.newRequest("GET", fmt.Sprintf("/v1/domains/%s/aliases/%s", domain, alias))
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (c *Client) GetAlias(domain string, alias string) (*Alias, error) {
 }
 
 // CreateAlias creates a new email alias for the specified domain with the given parameters.
-func (c *Client) CreateAlias(domain string, alias string, parameters AliasParameters) (*Alias, error) {
+func (c *Client) CreateAlias(domain, alias string, parameters AliasParameters) (*Alias, error) {
 	req, err := c.newRequest("POST", fmt.Sprintf("/v1/domains/%s/aliases", domain))
 	if err != nil {
 		return nil, err
@@ -131,7 +131,7 @@ func (c *Client) CreateAlias(domain string, alias string, parameters AliasParame
 }
 
 // UpdateAlias updates an existing email alias with new parameters for the specified domain.
-func (c *Client) UpdateAlias(domain string, alias string, parameters AliasParameters) (*Alias, error) {
+func (c *Client) UpdateAlias(domain, alias string, parameters AliasParameters) (*Alias, error) {
 	req, err := c.newRequest("PUT", fmt.Sprintf("/v1/domains/%s/aliases/%s", domain, alias))
 	if err != nil {
 		return nil, err
@@ -182,7 +182,7 @@ func (c *Client) UpdateAlias(domain string, alias string, parameters AliasParame
 }
 
 // DeleteAlias removes an email alias from the specified domain.
-func (c *Client) DeleteAlias(domain string, alias string) error {
+func (c *Client) DeleteAlias(domain, alias string) error {
 	req, err := c.newRequest("DELETE", fmt.Sprintf("/v1/domains/%s/aliases/%s", domain, alias))
 	if err != nil {
 		return err

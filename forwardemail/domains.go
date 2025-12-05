@@ -19,14 +19,14 @@ type Domain struct {
 	IsCatchallRegexDisabled   bool      `json:"is_catchall_regex_disabled"`
 	Plan                      string    `json:"plan"`
 	MaxRecipientsPerAlias     int       `json:"max_recipients_per_alias"`
-	SmtpPort                  string    `json:"smtp_port"`
+	SMTPPort                  string    `json:"smtp_port"`
 	Name                      string    `json:"name"`
 	HasMxRecord               bool      `json:"has_mx_record"`
 	HasTxtRecord              bool      `json:"has_txt_record"`
 	HasRecipientVerification  bool      `json:"has_recipient_verification"`
 	HasCustomVerification     bool      `json:"has_custom_verification"`
 	VerificationRecord        string    `json:"verification_record"`
-	Id                        string    `json:"id"`
+	ID                        string    `json:"id"`
 	Object                    string    `json:"object"`
 	CreatedAt                 time.Time `json:"created_at"`
 	UpdatedAt                 time.Time `json:"updated_at"`

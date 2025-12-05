@@ -42,7 +42,7 @@ func TestClient_GetAccount(t *testing.T) {
 				DisplayName:    "tony@stark.com",
 				LastLocale:     "en",
 				AddressCountry: "None",
-				Id:             "59ad551ae6fb4a4c53427ca38079f029",
+				ID:             "59ad551ae6fb4a4c53427ca38079f029",
 				Object:         "user",
 				Locale:         "en",
 				CreatedAt:      parseTime("2023-09-21T20:14:27.964Z"),
@@ -53,13 +53,13 @@ func TestClient_GetAccount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintf(w, tt.response)
 			}))
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.GetAccount()
