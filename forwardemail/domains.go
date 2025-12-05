@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// Domain represents a domain configuration with security settings, verification status, and metadata.
 type Domain struct {
 	HasAdultContentProtection bool      `json:"has_adult_content_protection"`
 	HasPhishingProtection     bool      `json:"has_phishing_protection"`
@@ -32,6 +33,7 @@ type Domain struct {
 	Link                      string    `json:"link"`
 }
 
+// DomainParameters contains optional parameters for creating or updating a domain.
 type DomainParameters struct {
 	HasAdultContentProtection *bool
 	HasPhishingProtection     *bool
@@ -40,6 +42,7 @@ type DomainParameters struct {
 	HasRecipientVerification  *bool
 }
 
+// GetDomains retrieves all domains associated with the authenticated account.
 func (c *Client) GetDomains() ([]Domain, error) {
 	req, err := c.newRequest("GET", "/v1/domains")
 	if err != nil {
@@ -61,6 +64,7 @@ func (c *Client) GetDomains() ([]Domain, error) {
 	return items, nil
 }
 
+// GetDomain retrieves a specific domain by name.
 func (c *Client) GetDomain(name string) (*Domain, error) {
 	req, err := c.newRequest("GET", fmt.Sprintf("/v1/domains/%s", name))
 	if err != nil {
@@ -82,6 +86,7 @@ func (c *Client) GetDomain(name string) (*Domain, error) {
 	return &item, nil
 }
 
+// CreateDomain adds a new domain to the account with the specified configuration parameters.
 func (c *Client) CreateDomain(name string, parameters DomainParameters) (*Domain, error) {
 	req, err := c.newRequest("POST", "/v1/domains")
 	if err != nil {
@@ -121,6 +126,7 @@ func (c *Client) CreateDomain(name string, parameters DomainParameters) (*Domain
 	return &item, nil
 }
 
+// UpdateDomain modifies an existing domain's configuration parameters.
 func (c *Client) UpdateDomain(name string, parameters DomainParameters) (*Domain, error) {
 	req, err := c.newRequest("PUT", fmt.Sprintf("/v1/domains/%s", name))
 	if err != nil {
@@ -160,6 +166,7 @@ func (c *Client) UpdateDomain(name string, parameters DomainParameters) (*Domain
 	return &item, nil
 }
 
+// DeleteDomain removes a domain from the account.
 func (c *Client) DeleteDomain(name string) error {
 	req, err := c.newRequest("DELETE", fmt.Sprintf("/v1/domains/%s", name))
 	if err != nil {

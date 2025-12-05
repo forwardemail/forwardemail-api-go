@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Invite represents a domain invitation for a user to join with a specific access group.
 type Invite struct {
 	Email     string    `json:"email"`
 	Group     string    `json:"group"`
@@ -18,6 +19,7 @@ type Invite struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// CreateDomainInvite sends an invitation to a user to join a domain with the specified group permissions.
 func (c *Client) CreateDomainInvite(domain, email, group string) (*Invite, error) {
 	req, err := c.newRequest("POST", fmt.Sprintf("/v1/domains/%s/invites", domain))
 	if err != nil {

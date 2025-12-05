@@ -10,11 +10,13 @@ const (
 	forwardemailApiUrl = "https://api.forwardemail.net"
 )
 
+// ClientOptions contains configuration options for creating a new Forward Email API client.
 type ClientOptions struct {
 	ApiKey string
 	ApiUrl string
 }
 
+// Client is the main client for interacting with the Forward Email API.
 type Client struct {
 	ApiKey string
 	ApiUrl string

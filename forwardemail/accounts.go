@@ -1,3 +1,4 @@
+// Package forwardemail provides a client library for interacting with the Forward Email API.
 package forwardemail
 
 import (
@@ -5,6 +6,7 @@ import (
 	"time"
 )
 
+// Account represents a Forward Email account with plan details, user information, and metadata.
 type Account struct {
 	Plan           string    `json:"plan"`
 	Email          string    `json:"email"`
@@ -20,6 +22,7 @@ type Account struct {
 	AddressHtml    string    `json:"address_html"`
 }
 
+// GetAccount retrieves the authenticated user's account information from the Forward Email API.
 func (c *Client) GetAccount() (*Account, error) {
 	req, err := c.newRequest("GET", "/v1/account")
 	if err != nil {
