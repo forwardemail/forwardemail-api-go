@@ -62,7 +62,7 @@ func TestClient_CreateDomainInvite(t *testing.T) {
 			defer svr.Close()
 
 			c := NewClient(ClientOptions{
-				ApiUrl: svr.URL,
+				APIURL: svr.URL,
 			})
 
 			got, _ := c.CreateDomainInvite(tt.domain, tt.email, tt.group)
