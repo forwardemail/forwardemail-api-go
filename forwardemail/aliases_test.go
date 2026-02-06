@@ -4,6 +4,7 @@
 package forwardemail
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -282,7 +283,7 @@ func TestClient_CreateAlias(t *testing.T) {
 				"labels": [
 				  "catch-all"
 				],
-				Description: "main email",
+				"description": "main email",
 				"is_enabled": true,
 				"has_recipient_verification": true,
 				"recipients": [
@@ -381,7 +382,7 @@ func TestClient_UpdateAlias(t *testing.T) {
 				  "catch-all",
 				  "friends"
 				],
-				Description: "main email",
+				"description": "main email",
 				"is_enabled": true,
 				"has_recipient_verification": true,
 				"recipients": [
@@ -447,10 +448,10 @@ func TestClient_DeleteAlias(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		req  request
-		res  response
-		want error
+		name      string
+		req       request
+		res       response
+		wantError bool
 	}{
 		{
 			name: "ok",
@@ -464,7 +465,7 @@ func TestClient_DeleteAlias(t *testing.T) {
 				code: http.StatusInternalServerError,
 				body: "oh no",
 			},
-			want: fmt.Errorf("failed to complete request: oh no"), //nolint:all
+			wantError: true,
 		},
 	}
 
@@ -472,7 +473,7 @@ func TestClient_DeleteAlias(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(tt.res.code)
-				fmt.Fprint(w, tt.res.body)
+				_, _ = w.Write([]byte(tt.res.body))
 			}))
 			defer svr.Close()
 
@@ -482,8 +483,15 @@ func TestClient_DeleteAlias(t *testing.T) {
 			})
 
 			got := c.DeleteAlias(tt.req.domain, tt.req.alias)
-			if diff := cmp.Diff(tt.want, got, cmp.Comparer(equateErrorMessage)); diff != "" {
-				t.Fatalf("values are not the same %s", diff)
+			if tt.wantError {
+				if got == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if !errors.Is(got, ErrRequestFailure) {
+					t.Fatalf("expected error to wrap ErrRequestFailure, got %v", got)
+				}
+			} else if got != nil {
+				t.Fatalf("expected no error, got %v", got)
 			}
 		})
 	}

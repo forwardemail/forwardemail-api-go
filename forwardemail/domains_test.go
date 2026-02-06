@@ -382,10 +382,10 @@ func TestClient_DeleteDomain(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		domain string
-		resp   response
-		want   error
+		name      string
+		domain    string
+		resp      response
+		wantError bool
 	}{
 		{
 			name: "ok",
@@ -399,7 +399,7 @@ func TestClient_DeleteDomain(t *testing.T) {
 				code: http.StatusInternalServerError,
 				body: "oh no",
 			},
-			want: fmt.Errorf("failed to complete request: oh no"), //nolint:all
+			wantError: true,
 		},
 	}
 
@@ -407,7 +407,7 @@ func TestClient_DeleteDomain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(tt.resp.code)
-				fmt.Fprint(w, tt.resp.body)
+				_, _ = w.Write([]byte(tt.resp.body))
 			}))
 			defer svr.Close()
 
@@ -417,20 +417,18 @@ func TestClient_DeleteDomain(t *testing.T) {
 			})
 
 			got := c.DeleteDomain(tt.domain)
-			if diff := cmp.Diff(tt.want, got, cmp.Comparer(equateErrorMessage)); diff != "" {
-				t.Fatalf("values are not the same %s", diff)
+			if tt.wantError {
+				if got == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if !errors.Is(got, ErrRequestFailure) {
+					t.Fatalf("expected error to wrap ErrRequestFailure, got %v", got)
+				}
+			} else if got != nil {
+				t.Fatalf("expected no error, got %v", got)
 			}
 		})
 	}
-}
-
-// I took this black magic from here (thanks Joe):
-// https://github.com/google/go-cmp/issues/24#issuecomment-317635190
-func equateErrorMessage(a, b error) bool {
-	if a == nil || b == nil {
-		return errors.Is(a, b)
-	}
-	return a.Error() == b.Error()
 }
 
 func pointBool(b bool) *bool {
