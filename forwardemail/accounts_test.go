@@ -1,3 +1,6 @@
+// Copyright Forward Email 2026
+// SPDX-License-Identifier: MIT
+
 package forwardemail
 
 import (
