@@ -20,4 +20,3 @@ client := forwardemail.NewClient(forwardemail.ClientOptions{
 
 account, err := client.GetAccount()
 ```
-
