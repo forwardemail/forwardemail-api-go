@@ -61,7 +61,7 @@ func TestNewClient(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewClient(tt.options)
+			got, _ := NewClient(tt.options)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}

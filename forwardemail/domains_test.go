@@ -72,11 +72,12 @@ func TestClient_GetDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				fmt.Fprintf(w, tt.response)
+				fmt.Fprint(w, tt.response)
 			}))
 			defer svr.Close()
 
-			c := NewClient(ClientOptions{
+			c, _ := NewClient(ClientOptions{
+				APIKey: "test-key",
 				APIURL: svr.URL,
 			})
 
@@ -189,11 +190,12 @@ func TestClient_GetDomains(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				fmt.Fprintf(w, tt.response)
+				fmt.Fprint(w, tt.response)
 			}))
 			defer svr.Close()
 
-			c := NewClient(ClientOptions{
+			c, _ := NewClient(ClientOptions{
+				APIKey: "test-key",
 				APIURL: svr.URL,
 			})
 
@@ -272,11 +274,12 @@ func TestClient_CreateDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				fmt.Fprintf(w, tt.response)
+				fmt.Fprint(w, tt.response)
 			}))
 			defer svr.Close()
 
-			c := NewClient(ClientOptions{
+			c, _ := NewClient(ClientOptions{
+				APIKey: "test-key",
 				APIURL: svr.URL,
 			})
 
@@ -355,11 +358,12 @@ func TestClient_UpdateDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				fmt.Fprintf(w, tt.response)
+				fmt.Fprint(w, tt.response)
 			}))
 			defer svr.Close()
 
-			c := NewClient(ClientOptions{
+			c, _ := NewClient(ClientOptions{
+				APIKey: "test-key",
 				APIURL: svr.URL,
 			})
 
@@ -403,11 +407,12 @@ func TestClient_DeleteDomain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(tt.resp.code)
-				fmt.Fprintf(w, tt.resp.body)
+				fmt.Fprint(w, tt.resp.body)
 			}))
 			defer svr.Close()
 
-			c := NewClient(ClientOptions{
+			c, _ := NewClient(ClientOptions{
+				APIKey: "test-key",
 				APIURL: svr.URL,
 			})
 

@@ -60,11 +60,12 @@ func TestClient_CreateDomainInvite(t *testing.T) {
 				if r.URL.Path != fmt.Sprintf("/v1/domains/%s/invites", tt.domain) {
 					t.Errorf("expected URL %s, got %s", fmt.Sprintf("/v1/domains/%s/invites", tt.domain), r.URL.Path)
 				}
-				fmt.Fprintf(w, tt.response)
+				fmt.Fprint(w, tt.response)
 			}))
 			defer svr.Close()
 
-			c := NewClient(ClientOptions{
+			c, _ := NewClient(ClientOptions{
+				APIKey: "test-key",
 				APIURL: svr.URL,
 			})
 
