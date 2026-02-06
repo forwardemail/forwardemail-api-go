@@ -1,0 +1,47 @@
+name: Forward Email SDK Tests
+
+# This GitHub action runs your tests for each pull request and push.
+on:
+  pull_request:
+    paths:
+      - "forwardemail/**.go"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/tests.yml"
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - run: go mod tidy
+      - run: go mod download
+      - run: go build -v ./...
+
+  sdk-tests:
+    name: SDK Unit Tests
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - name: Download Dependencies
+        run: go mod download
+      - name: Run SDK Tests
+        run: go test -v -race -coverprofile=coverage.out ./armis/... | tee sdk-test.log
