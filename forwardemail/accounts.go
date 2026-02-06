@@ -1,3 +1,6 @@
+// Copyright Forward Email 2026
+// SPDX-License-Identifier: MIT
+
 // Package forwardemail provides a client library for interacting with the Forward Email API.
 package forwardemail
 

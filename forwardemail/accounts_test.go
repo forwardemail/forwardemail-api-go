@@ -1,3 +1,6 @@
+// Copyright Forward Email 2026
+// SPDX-License-Identifier: MIT
+
 package forwardemail
 
 import (
@@ -54,11 +57,12 @@ func TestClient_GetAccount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				fmt.Fprintf(w, tt.response)
+				fmt.Fprint(w, tt.response)
 			}))
 			defer svr.Close()
 
-			c := NewClient(ClientOptions{
+			c, _ := NewClient(ClientOptions{
+				APIKey: "test-key",
 				APIURL: svr.URL,
 			})
 

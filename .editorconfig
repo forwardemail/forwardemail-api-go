@@ -17,4 +17,3 @@ indent_size = 2
 [*.{tf,tfvars,tpl}]
 indent_style = space
 indent_size = 2
-

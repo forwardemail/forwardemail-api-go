@@ -1,9 +1,13 @@
+// Copyright Forward Email 2026
+// SPDX-License-Identifier: MIT
+
 package forwardemail
 
 import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 const (
@@ -25,17 +29,23 @@ type Client struct {
 }
 
 // NewClient returns a new Forward Email API Client.
-func NewClient(options ClientOptions) *Client {
+func NewClient(options ClientOptions) (*Client, error) {
 	apiURL := forwardemailAPIURL
 	if options.APIURL != "" {
 		apiURL = options.APIURL
 	}
 
-	return &Client{
+	if options.APIKey == "" {
+		return nil, fmt.Errorf("%w", ErrMissingAPIKey)
+	}
+
+	c := &Client{
 		APIKey:     options.APIKey,
 		APIURL:     apiURL,
-		HTTPClient: http.DefaultClient,
+		HTTPClient: &http.Client{Timeout: 30 * time.Second},
 	}
+
+	return c, nil
 }
 
 func (c *Client) newRequest(method, path string) (*http.Request, error) {

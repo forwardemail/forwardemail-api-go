@@ -83,4 +83,3 @@ output:
     - file
   # Show statistics
   show-stats: true
-
