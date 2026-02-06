@@ -44,4 +44,4 @@ jobs:
       - name: Download Dependencies
         run: go mod download
       - name: Run SDK Tests
-        run: go test -v -race -coverprofile=coverage.out ./armis/... | tee sdk-test.log
+        run: go test -v -race -coverprofile=coverage.out ./forwardemail/...
