@@ -5,7 +5,9 @@
 package forwardemail
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -26,22 +28,27 @@ type Account struct {
 }
 
 // GetAccount retrieves the authenticated user's account information from the Forward Email API.
-func (c *Client) GetAccount() (*Account, error) {
-	req, err := c.newRequest("GET", "/v1/account")
-	if err != nil {
+func (c *Client) GetAccount(ctx context.Context) (*Account, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+
+	req, err := c.newRequest(ctx, "GET", "/v1/account", nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for GetAccount: %w", err)
 	}
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch account: %w", err)
 	}
 
 	var item Account
-
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse account response: %w", err)
 	}
 
 	return &item, nil

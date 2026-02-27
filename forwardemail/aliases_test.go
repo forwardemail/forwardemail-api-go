@@ -4,6 +4,7 @@
 package forwardemail
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -28,6 +29,10 @@ func TestClient_GetAlias(t *testing.T) {
 	}{
 		{
 			name: "no data",
+			req: request{
+				domain: "stark.com",
+				alias:  "tony",
+			},
 		},
 		{
 			name: "ok",
@@ -91,12 +96,9 @@ func TestClient_GetAlias(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.GetAlias(tt.req.domain, tt.req.alias)
+			got, _ := c.GetAlias(context.Background(), tt.req.domain, tt.req.alias)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -117,6 +119,9 @@ func TestClient_GetAliases(t *testing.T) {
 	}{
 		{
 			name: "no data",
+			req: request{
+				domain: "stark.com",
+			},
 		},
 		{
 			name: "ok",
@@ -227,12 +232,9 @@ func TestClient_GetAliases(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.GetAliases(tt.req.domain)
+			got, _ := c.GetAliases(context.Background(), tt.req.domain)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -255,6 +257,10 @@ func TestClient_CreateAlias(t *testing.T) {
 	}{
 		{
 			name: "no data",
+			req: request{
+				domain: "stark.com",
+				alias:  "tony",
+			},
 		},
 		{
 			name: "ok",
@@ -325,12 +331,9 @@ func TestClient_CreateAlias(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.CreateAlias(tt.req.domain, tt.req.alias, tt.req.params)
+			got, _ := c.CreateAlias(context.Background(), tt.req.domain, tt.req.alias, tt.req.params)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -353,6 +356,10 @@ func TestClient_UpdateAlias(t *testing.T) {
 	}{
 		{
 			name: "no data",
+			req: request{
+				domain: "stark.com",
+				alias:  "tony",
+			},
 		},
 		{
 			name: "ok",
@@ -424,12 +431,9 @@ func TestClient_UpdateAlias(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.UpdateAlias(tt.req.domain, tt.req.alias, tt.req.params)
+			got, _ := c.UpdateAlias(context.Background(), tt.req.domain, tt.req.alias, tt.req.params)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -455,12 +459,20 @@ func TestClient_DeleteAlias(t *testing.T) {
 	}{
 		{
 			name: "ok",
+			req: request{
+				domain: "stark.com",
+				alias:  "tony",
+			},
 			res: response{
 				code: http.StatusNoContent,
 			},
 		},
 		{
 			name: "not ok",
+			req: request{
+				domain: "stark.com",
+				alias:  "tony",
+			},
 			res: response{
 				code: http.StatusInternalServerError,
 				body: "oh no",
@@ -477,18 +489,16 @@ func TestClient_DeleteAlias(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got := c.DeleteAlias(tt.req.domain, tt.req.alias)
+			got := c.DeleteAlias(context.Background(), tt.req.domain, tt.req.alias)
 			if tt.wantError {
 				if got == nil {
 					t.Fatal("expected error, got nil")
 				}
-				if !errors.Is(got, ErrRequestFailure) {
-					t.Fatalf("expected error to wrap ErrRequestFailure, got %v", got)
+				var apiErr *APIError
+				if !errors.As(got, &apiErr) {
+					t.Fatalf("expected error to wrap *APIError, got %v", got)
 				}
 			} else if got != nil {
 				t.Fatalf("expected no error, got %v", got)

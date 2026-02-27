@@ -4,6 +4,7 @@
 package forwardemail
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -64,12 +65,9 @@ func TestClient_CreateDomainInvite(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.CreateDomainInvite(tt.domain, tt.email, tt.group)
+			got, _ := c.CreateDomainInvite(context.Background(), tt.domain, tt.email, tt.group)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}

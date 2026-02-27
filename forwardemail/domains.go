@@ -4,9 +4,9 @@
 package forwardemail
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/url"
 	"strconv"
 	"strings"
@@ -46,54 +46,74 @@ type DomainParameters struct {
 }
 
 // GetDomains retrieves all domains associated with the authenticated account.
-func (c *Client) GetDomains() ([]Domain, error) {
-	req, err := c.newRequest("GET", "/v1/domains")
-	if err != nil {
+func (c *Client) GetDomains(ctx context.Context) ([]Domain, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+
+	req, err := c.newRequest(ctx, "GET", "/v1/domains", nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for GetDomains: %w", err)
 	}
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch domains: %w", err)
 	}
 
 	var items []Domain
-
-	err = json.Unmarshal(res, &items)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &items); err != nil {
+		return nil, fmt.Errorf("failed to parse domains response: %w", err)
 	}
 
 	return items, nil
 }
 
 // GetDomain retrieves a specific domain by name.
-func (c *Client) GetDomain(name string) (*Domain, error) {
-	req, err := c.newRequest("GET", fmt.Sprintf("/v1/domains/%s", name))
-	if err != nil {
+func (c *Client) GetDomain(ctx context.Context, name string) (*Domain, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+	if strings.TrimSpace(name) == "" {
+		return nil, ErrEmptyDomainName
+	}
+
+	encodedName := url.PathEscape(name)
+
+	req, err := c.newRequest(ctx, "GET", fmt.Sprintf("/v1/domains/%s", encodedName), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for GetDomain: %w", err)
 	}
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch domain: %w", err)
 	}
 
 	var item Domain
-
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse domain response: %w", err)
 	}
 
 	return &item, nil
 }
 
 // CreateDomain adds a new domain to the account with the specified configuration parameters.
-func (c *Client) CreateDomain(name string, parameters DomainParameters) (*Domain, error) {
-	req, err := c.newRequest("POST", "/v1/domains")
-	if err != nil {
+func (c *Client) CreateDomain(ctx context.Context, name string, parameters DomainParameters) (*Domain, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+	if strings.TrimSpace(name) == "" {
+		return nil, ErrEmptyDomainName
 	}
 
 	params := url.Values{}
@@ -111,30 +131,39 @@ func (c *Client) CreateDomain(name string, parameters DomainParameters) (*Domain
 		}
 	}
 
-	req.Body = io.NopCloser(strings.NewReader(params.Encode()))
+	req, err := c.newRequest(ctx, "POST", "/v1/domains", strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for CreateDomain: %w", err)
+	}
+
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create domain: %w", err)
 	}
 
 	var item Domain
-
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse create domain response: %w", err)
 	}
 
 	return &item, nil
 }
 
 // UpdateDomain modifies an existing domain's configuration parameters.
-func (c *Client) UpdateDomain(name string, parameters DomainParameters) (*Domain, error) {
-	req, err := c.newRequest("PUT", fmt.Sprintf("/v1/domains/%s", name))
-	if err != nil {
+func (c *Client) UpdateDomain(ctx context.Context, name string, parameters DomainParameters) (*Domain, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	if strings.TrimSpace(name) == "" {
+		return nil, ErrEmptyDomainName
+	}
+
+	encodedName := url.PathEscape(name)
 
 	params := url.Values{}
 	params.Add("domain", name)
@@ -151,34 +180,48 @@ func (c *Client) UpdateDomain(name string, parameters DomainParameters) (*Domain
 		}
 	}
 
-	req.Body = io.NopCloser(strings.NewReader(params.Encode()))
+	req, err := c.newRequest(ctx, "PUT", fmt.Sprintf("/v1/domains/%s", encodedName), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for UpdateDomain: %w", err)
+	}
+
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update domain: %w", err)
 	}
 
 	var item Domain
-
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse update domain response: %w", err)
 	}
 
 	return &item, nil
 }
 
 // DeleteDomain removes a domain from the account.
-func (c *Client) DeleteDomain(name string) error {
-	req, err := c.newRequest("DELETE", fmt.Sprintf("/v1/domains/%s", name))
-	if err != nil {
+func (c *Client) DeleteDomain(ctx context.Context, name string) error {
+	if ctx == nil {
+		return ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return err
+	}
+	if strings.TrimSpace(name) == "" {
+		return ErrEmptyDomainName
+	}
+
+	encodedName := url.PathEscape(name)
+
+	req, err := c.newRequest(ctx, "DELETE", fmt.Sprintf("/v1/domains/%s", encodedName), nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request for DeleteDomain: %w", err)
 	}
 
 	_, err = c.doRequest(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to delete domain: %w", err)
 	}
 
 	return nil
