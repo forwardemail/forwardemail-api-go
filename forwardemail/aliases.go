@@ -4,9 +4,9 @@
 package forwardemail
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/url"
 	"strconv"
 	"strings"
@@ -39,55 +39,89 @@ type AliasParameters struct {
 }
 
 // GetAliases retrieves all email aliases for the specified domain.
-func (c *Client) GetAliases(domain string) ([]Alias, error) {
-	req, err := c.newRequest("GET", fmt.Sprintf("/v1/domains/%s/aliases", domain))
-	if err != nil {
+func (c *Client) GetAliases(ctx context.Context, domain string) ([]Alias, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+	if strings.TrimSpace(domain) == "" {
+		return nil, ErrEmptyDomain
+	}
+
+	encodedDomain := url.PathEscape(domain)
+
+	req, err := c.newRequest(ctx, "GET", fmt.Sprintf("/v1/domains/%s/aliases", encodedDomain), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for GetAliases: %w", err)
 	}
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch aliases: %w", err)
 	}
 
 	var items []Alias
-
-	err = json.Unmarshal(res, &items)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &items); err != nil {
+		return nil, fmt.Errorf("failed to parse aliases response: %w", err)
 	}
 
 	return items, nil
 }
 
 // GetAlias retrieves a specific email alias by name for the specified domain.
-func (c *Client) GetAlias(domain, alias string) (*Alias, error) {
-	req, err := c.newRequest("GET", fmt.Sprintf("/v1/domains/%s/aliases/%s", domain, alias))
-	if err != nil {
+func (c *Client) GetAlias(ctx context.Context, domain, alias string) (*Alias, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+	if strings.TrimSpace(domain) == "" {
+		return nil, ErrEmptyDomain
+	}
+	if strings.TrimSpace(alias) == "" {
+		return nil, ErrEmptyAlias
+	}
+
+	encodedDomain := url.PathEscape(domain)
+	encodedAlias := url.PathEscape(alias)
+
+	req, err := c.newRequest(ctx, "GET", fmt.Sprintf("/v1/domains/%s/aliases/%s", encodedDomain, encodedAlias), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for GetAlias: %w", err)
 	}
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch alias: %w", err)
 	}
 
 	var item Alias
-
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse alias response: %w", err)
 	}
 
 	return &item, nil
 }
 
 // CreateAlias creates a new email alias for the specified domain with the given parameters.
-func (c *Client) CreateAlias(domain, alias string, parameters AliasParameters) (*Alias, error) {
-	req, err := c.newRequest("POST", fmt.Sprintf("/v1/domains/%s/aliases", domain))
-	if err != nil {
+func (c *Client) CreateAlias(ctx context.Context, domain, alias string, parameters AliasParameters) (*Alias, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	if strings.TrimSpace(domain) == "" {
+		return nil, ErrEmptyDomain
+	}
+	if strings.TrimSpace(alias) == "" {
+		return nil, ErrEmptyAlias
+	}
+
+	encodedDomain := url.PathEscape(domain)
 
 	params := url.Values{}
 	params.Add("name", alias)
@@ -115,30 +149,43 @@ func (c *Client) CreateAlias(domain, alias string, parameters AliasParameters) (
 		}
 	}
 
-	req.Body = io.NopCloser(strings.NewReader(params.Encode()))
+	req, err := c.newRequest(ctx, "POST", fmt.Sprintf("/v1/domains/%s/aliases", encodedDomain), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for CreateAlias: %w", err)
+	}
+
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create alias: %w", err)
 	}
 
 	var item Alias
-
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse create alias response: %w", err)
 	}
 
 	return &item, nil
 }
 
 // UpdateAlias updates an existing email alias with new parameters for the specified domain.
-func (c *Client) UpdateAlias(domain, alias string, parameters AliasParameters) (*Alias, error) {
-	req, err := c.newRequest("PUT", fmt.Sprintf("/v1/domains/%s/aliases/%s", domain, alias))
-	if err != nil {
+func (c *Client) UpdateAlias(ctx context.Context, domain, alias string, parameters AliasParameters) (*Alias, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	if strings.TrimSpace(domain) == "" {
+		return nil, ErrEmptyDomain
+	}
+	if strings.TrimSpace(alias) == "" {
+		return nil, ErrEmptyAlias
+	}
+
+	encodedDomain := url.PathEscape(domain)
+	encodedAlias := url.PathEscape(alias)
 
 	params := url.Values{}
 	params.Add("name", alias)
@@ -166,34 +213,52 @@ func (c *Client) UpdateAlias(domain, alias string, parameters AliasParameters) (
 		}
 	}
 
-	req.Body = io.NopCloser(strings.NewReader(params.Encode()))
+	req, err := c.newRequest(ctx, "PUT", fmt.Sprintf("/v1/domains/%s/aliases/%s", encodedDomain, encodedAlias), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for UpdateAlias: %w", err)
+	}
+
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update alias: %w", err)
 	}
 
 	var item Alias
-
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, err
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse update alias response: %w", err)
 	}
 
 	return &item, nil
 }
 
 // DeleteAlias removes an email alias from the specified domain.
-func (c *Client) DeleteAlias(domain, alias string) error {
-	req, err := c.newRequest("DELETE", fmt.Sprintf("/v1/domains/%s/aliases/%s", domain, alias))
-	if err != nil {
+func (c *Client) DeleteAlias(ctx context.Context, domain, alias string) error {
+	if ctx == nil {
+		return ErrNilContext
+	}
+	if err := ctx.Err(); err != nil {
 		return err
+	}
+	if strings.TrimSpace(domain) == "" {
+		return ErrEmptyDomain
+	}
+	if strings.TrimSpace(alias) == "" {
+		return ErrEmptyAlias
+	}
+
+	encodedDomain := url.PathEscape(domain)
+	encodedAlias := url.PathEscape(alias)
+
+	req, err := c.newRequest(ctx, "DELETE", fmt.Sprintf("/v1/domains/%s/aliases/%s", encodedDomain, encodedAlias), nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request for DeleteAlias: %w", err)
 	}
 
 	_, err = c.doRequest(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to delete alias: %w", err)
 	}
 
 	return nil

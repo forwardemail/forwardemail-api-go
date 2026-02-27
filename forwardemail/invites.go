@@ -4,11 +4,11 @@
 package forwardemail
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -23,28 +23,44 @@ type Invite struct {
 }
 
 // CreateDomainInvite sends an invitation to a user to join a domain with the specified group permissions.
-func (c *Client) CreateDomainInvite(domain, email, group string) (*Invite, error) {
-	req, err := c.newRequest("POST", fmt.Sprintf("/v1/domains/%s/invites", domain))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+func (c *Client) CreateDomainInvite(ctx context.Context, domain, email, group string) (*Invite, error) {
+	if ctx == nil {
+		return nil, ErrNilContext
 	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if strings.TrimSpace(domain) == "" {
+		return nil, ErrEmptyDomain
+	}
+	if strings.TrimSpace(email) == "" {
+		return nil, ErrEmptyEmail
+	}
+	if strings.TrimSpace(group) == "" {
+		return nil, ErrEmptyGroup
+	}
+
+	encodedDomain := url.PathEscape(domain)
 
 	params := url.Values{}
 	params.Add("email", email)
 	params.Add("group", group)
 
-	req.Body = io.NopCloser(bytes.NewBufferString(params.Encode()))
+	req, err := c.newRequest(ctx, "POST", fmt.Sprintf("/v1/domains/%s/invites", encodedDomain), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for CreateDomainInvite: %w", err)
+	}
+
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := c.doRequest(req)
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, fmt.Errorf("failed to create domain invite: %w", err)
 	}
 
 	var item Invite
-	err = json.Unmarshal(res, &item)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse response: %w", err)
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse domain invite response: %w", err)
 	}
 
 	return &item, nil

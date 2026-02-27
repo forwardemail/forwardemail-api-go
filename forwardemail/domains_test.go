@@ -4,6 +4,7 @@
 package forwardemail
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -21,7 +22,8 @@ func TestClient_GetDomain(t *testing.T) {
 		want     *Domain
 	}{
 		{
-			name: "no data",
+			name:   "no data",
+			domain: "stark.com",
 		},
 		{
 			name:   "ok",
@@ -76,12 +78,9 @@ func TestClient_GetDomain(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.GetDomain(tt.domain)
+			got, _ := c.GetDomain(context.Background(), tt.domain)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -194,12 +193,9 @@ func TestClient_GetDomains(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.GetDomains()
+			got, _ := c.GetDomains(context.Background())
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -216,7 +212,8 @@ func TestClient_CreateDomain(t *testing.T) {
 		want       *Domain
 	}{
 		{
-			name: "no data",
+			name:   "no data",
+			domain: "stark.com",
 		},
 		{
 			name:   "ok",
@@ -278,12 +275,9 @@ func TestClient_CreateDomain(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.CreateDomain(tt.domain, tt.parameters)
+			got, _ := c.CreateDomain(context.Background(), tt.domain, tt.parameters)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -300,7 +294,8 @@ func TestClient_UpdateDomain(t *testing.T) {
 		want       *Domain
 	}{
 		{
-			name: "no data",
+			name:   "no data",
+			domain: "stark.com",
 		},
 		{
 			name:   "ok",
@@ -362,12 +357,9 @@ func TestClient_UpdateDomain(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got, _ := c.UpdateDomain(tt.domain, tt.parameters)
+			got, _ := c.UpdateDomain(context.Background(), tt.domain, tt.parameters)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("values are not the same %s", diff)
 			}
@@ -388,13 +380,15 @@ func TestClient_DeleteDomain(t *testing.T) {
 		wantError bool
 	}{
 		{
-			name: "ok",
+			name:   "ok",
+			domain: "stark.com",
 			resp: response{
 				code: http.StatusNoContent,
 			},
 		},
 		{
-			name: "not ok",
+			name:   "not ok",
+			domain: "stark.com",
 			resp: response{
 				code: http.StatusInternalServerError,
 				body: "oh no",
@@ -411,18 +405,16 @@ func TestClient_DeleteDomain(t *testing.T) {
 			}))
 			defer svr.Close()
 
-			c, _ := NewClient(ClientOptions{
-				APIKey: "test-key",
-				APIURL: svr.URL,
-			})
+			c, _ := NewClient("test-key", WithAPIURL(svr.URL))
 
-			got := c.DeleteDomain(tt.domain)
+			got := c.DeleteDomain(context.Background(), tt.domain)
 			if tt.wantError {
 				if got == nil {
 					t.Fatal("expected error, got nil")
 				}
-				if !errors.Is(got, ErrRequestFailure) {
-					t.Fatalf("expected error to wrap ErrRequestFailure, got %v", got)
+				var apiErr *APIError
+				if !errors.As(got, &apiErr) {
+					t.Fatalf("expected error to wrap *APIError, got %v", got)
 				}
 			} else if got != nil {
 				t.Fatalf("expected no error, got %v", got)
