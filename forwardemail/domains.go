@@ -119,17 +119,7 @@ func (c *Client) CreateDomain(ctx context.Context, name string, parameters Domai
 	params := url.Values{}
 	params.Add("domain", name)
 
-	for k, v := range map[string]*bool{
-		"has_adult_content_protection": parameters.HasAdultContentProtection,
-		"has_phishing_protection":      parameters.HasPhishingProtection,
-		"has_executable_protection":    parameters.HasExecutableProtection,
-		"has_virus_protection":         parameters.HasVirusProtection,
-		"has_recipient_verification":   parameters.HasRecipientVerification,
-	} {
-		if v != nil {
-			params.Add(k, strconv.FormatBool(*v))
-		}
-	}
+	encodeDomainParams(params, parameters)
 
 	req, err := c.newRequest(ctx, "POST", "/v1/domains", strings.NewReader(params.Encode()))
 	if err != nil {
@@ -168,17 +158,7 @@ func (c *Client) UpdateDomain(ctx context.Context, name string, parameters Domai
 	params := url.Values{}
 	params.Add("domain", name)
 
-	for k, v := range map[string]*bool{
-		"has_adult_content_protection": parameters.HasAdultContentProtection,
-		"has_phishing_protection":      parameters.HasPhishingProtection,
-		"has_executable_protection":    parameters.HasExecutableProtection,
-		"has_virus_protection":         parameters.HasVirusProtection,
-		"has_recipient_verification":   parameters.HasRecipientVerification,
-	} {
-		if v != nil {
-			params.Add(k, strconv.FormatBool(*v))
-		}
-	}
+	encodeDomainParams(params, parameters)
 
 	req, err := c.newRequest(ctx, "PUT", fmt.Sprintf("/v1/domains/%s", encodedName), strings.NewReader(params.Encode()))
 	if err != nil {
@@ -225,4 +205,18 @@ func (c *Client) DeleteDomain(ctx context.Context, name string) error {
 	}
 
 	return nil
+}
+
+func encodeDomainParams(params url.Values, parameters DomainParameters) {
+	for k, v := range map[string]*bool{
+		"has_adult_content_protection": parameters.HasAdultContentProtection,
+		"has_phishing_protection":      parameters.HasPhishingProtection,
+		"has_executable_protection":    parameters.HasExecutableProtection,
+		"has_virus_protection":         parameters.HasVirusProtection,
+		"has_recipient_verification":   parameters.HasRecipientVerification,
+	} {
+		if v != nil {
+			params.Add(k, strconv.FormatBool(*v))
+		}
+	}
 }
