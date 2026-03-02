@@ -125,29 +125,7 @@ func (c *Client) CreateAlias(ctx context.Context, domain, alias string, paramete
 
 	params := url.Values{}
 	params.Add("name", alias)
-	if parameters.Description != "" {
-		params.Add("description", parameters.Description)
-	}
-
-	for k, v := range map[string]*bool{
-		"has_recipient_verification": parameters.HasRecipientVerification,
-		"is_enabled":                 parameters.IsEnabled,
-	} {
-		if v != nil {
-			params.Add(k, strconv.FormatBool(*v))
-		}
-	}
-
-	for k, v := range map[string]*[]string{
-		"recipients[]": parameters.Recipients,
-		"labels[]":     parameters.Labels,
-	} {
-		if v != nil {
-			for _, vv := range *v {
-				params.Add(k, vv)
-			}
-		}
-	}
+	encodeAliasParams(params, parameters)
 
 	req, err := c.newRequest(ctx, "POST", fmt.Sprintf("/v1/domains/%s/aliases", encodedDomain), strings.NewReader(params.Encode()))
 	if err != nil {
@@ -189,6 +167,29 @@ func (c *Client) UpdateAlias(ctx context.Context, domain, alias string, paramete
 
 	params := url.Values{}
 	params.Add("name", alias)
+	encodeAliasParams(params, parameters)
+
+	req, err := c.newRequest(ctx, "PUT", fmt.Sprintf("/v1/domains/%s/aliases/%s", encodedDomain, encodedAlias), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for UpdateAlias: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	res, err := c.doRequest(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update alias: %w", err)
+	}
+
+	var item Alias
+	if err := json.Unmarshal(res, &item); err != nil {
+		return nil, fmt.Errorf("failed to parse update alias response: %w", err)
+	}
+
+	return &item, nil
+}
+
+func encodeAliasParams(params url.Values, parameters AliasParameters) {
 	if parameters.Description != "" {
 		params.Add("description", parameters.Description)
 	}
@@ -212,25 +213,6 @@ func (c *Client) UpdateAlias(ctx context.Context, domain, alias string, paramete
 			}
 		}
 	}
-
-	req, err := c.newRequest(ctx, "PUT", fmt.Sprintf("/v1/domains/%s/aliases/%s", encodedDomain, encodedAlias), strings.NewReader(params.Encode()))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request for UpdateAlias: %w", err)
-	}
-
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	res, err := c.doRequest(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to update alias: %w", err)
-	}
-
-	var item Alias
-	if err := json.Unmarshal(res, &item); err != nil {
-		return nil, fmt.Errorf("failed to parse update alias response: %w", err)
-	}
-
-	return &item, nil
 }
 
 // DeleteAlias removes an email alias from the specified domain.
