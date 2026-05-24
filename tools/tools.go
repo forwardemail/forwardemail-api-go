@@ -3,10 +3,10 @@
 package tools
 
 import (
-	_ "github.com/hashicorp/copywrite"
-	_ "mvdan.cc/gofumpt"
-	_ "golang.org/x/tools/cmd/goimports"
 	_ "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
+	_ "github.com/hashicorp/copywrite"
+	_ "golang.org/x/tools/cmd/goimports"
+	_ "mvdan.cc/gofumpt"
 )
 
 // Generate copyright headers
