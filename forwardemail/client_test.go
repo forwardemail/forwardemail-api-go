@@ -29,9 +29,9 @@ func TestNewClient(t *testing.T) {
 			wantURL: "https://api.forwardemail.net",
 		},
 		{
-			name:   "with custom URL",
-			apiKey: "4e4d6c332b6fe62a63afe56171fd3725",
-			opts:   []Option{WithAPIURL("https://google.com")},
+			name:    "with custom URL",
+			apiKey:  "4e4d6c332b6fe62a63afe56171fd3725",
+			opts:    []Option{WithAPIURL("https://google.com")},
 			wantURL: "https://google.com",
 		},
 		{
@@ -41,9 +41,9 @@ func TestNewClient(t *testing.T) {
 			wantError: ErrNilHTTPClient,
 		},
 		{
-			name:   "with custom http client",
-			apiKey: "4e4d6c332b6fe62a63afe56171fd3725",
-			opts:   []Option{WithHTTPClient(&http.Client{Timeout: 10 * time.Second})},
+			name:    "with custom http client",
+			apiKey:  "4e4d6c332b6fe62a63afe56171fd3725",
+			opts:    []Option{WithHTTPClient(&http.Client{Timeout: 10 * time.Second})},
 			wantURL: "https://api.forwardemail.net",
 		},
 	}
